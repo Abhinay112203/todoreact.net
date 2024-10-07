@@ -1,24 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import "./App.css";
+import Home from "./Components/Home/Home";
+import Login from "./Components/Login/Login";
+import AuthorisedLayout from "./Layouts/Authorised";
+import UnAuthorisedLayout from "./Layouts/UnAuthorised";
+
+function WildRoute() {
+  return <Navigate to="/login" />;
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/auth" element={<AuthorisedLayout />}>
+          <Route index element={<Home />} />
+        </Route>
+        <Route path="/" element={<UnAuthorisedLayout />}>
+          <Route index element={<Login />} />
+          <Route path="login" element={<Login />} />
+        </Route>
+        <Route path="*" index element={<WildRoute />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
