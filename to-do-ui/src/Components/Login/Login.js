@@ -1,6 +1,11 @@
-import './Login.css'
+import { useLoading } from "../Loader/LoadingProvider";
+import "./Login.css";
 function Login() {
-  return <div className="container" >  Login Page</div>;
+  const { loading, setLoading } = useLoading();
+  function handleClick() {
+    setLoading(!loading);
+  }
+  return <div className="container"> Login Page</div>;
 }
 
 export default Login;
