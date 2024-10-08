@@ -17,7 +17,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 
 const drawerWidth = 240;
@@ -82,7 +82,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function AuthorisedLayout() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
 
   const handleDrawerOpen = () => {
     setOpen(!open);
@@ -91,6 +91,26 @@ export default function AuthorisedLayout() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  useEffect(() => {
+    getLists();
+    return () => {};
+  }, []);
+
+  async function getLists() {
+    let token = localStorage.getItem("token");
+    let headers = new Headers();
+    headers.append("content-type", "application/json");
+    headers.append("Authorization", "Bearer " + token);
+    await fetch("http://localhost:5134/api/lists", {
+      method: "GET",
+      headers,
+    }).then(async (res) => {
+      if (res.ok) {
+        let response = await res.json();
+        console.log(response);
+      }
+    });
+  }
 
   return (
     <Box sx={{ display: "flex" }}>

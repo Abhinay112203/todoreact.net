@@ -4,7 +4,7 @@ import './Loader.css';
 
 function LoadingComponent(){
   const { loading, setLoading } = useLoading();
-    return <div className={loading? "showLoader" : "hideLoader"} > Loading </div>
+    return <div className={loading? "showLoader" : "hideLoader"} > <div>Loading</div> </div>
 }
 
 export default LoadingComponent;

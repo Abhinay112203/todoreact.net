@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAPI.Models.ApplicationDbContext;
 
@@ -10,27 +11,13 @@ using ToDoAPI.Models.ApplicationDbContext;
 namespace ToDoAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008095038_AddedLists")]
+    partial class AddedLists
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.33");
-
-            modelBuilder.Entity("ToDoAPI.Models.ListUser", b =>
-                {
-                    b.Property<string>("ToDoListId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ToDoListId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ListUser");
-                });
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoItem", b =>
                 {
@@ -71,8 +58,9 @@ namespace ToDoAPI.Migrations
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("CreatedById")
                         .IsRequired()
@@ -169,25 +157,6 @@ namespace ToDoAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ToDoAPI.Models.ListUser", b =>
-                {
-                    b.HasOne("ToDoAPI.Models.ToDoList", "ToDoList")
-                        .WithMany("ListUsers")
-                        .HasForeignKey("ToDoListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ToDoAPI.Models.Users", "User")
-                        .WithMany("ListUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ToDoList");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>
                 {
                     b.HasOne("ToDoAPI.Models.Users", "CreatedBy")
@@ -199,15 +168,8 @@ namespace ToDoAPI.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>
-                {
-                    b.Navigation("ListUsers");
-                });
-
             modelBuilder.Entity("ToDoAPI.Models.Users", b =>
                 {
-                    b.Navigation("ListUsers");
-
                     b.Navigation("ToDoLists");
                 });
 #pragma warning restore 612, 618

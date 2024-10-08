@@ -26,7 +26,9 @@ namespace ToDoAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Users>>> Get()
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users
+                //.Include(e => e.ToDoLists)
+                .ToListAsync();
         }
 
         // GET api/<UsersController>/5

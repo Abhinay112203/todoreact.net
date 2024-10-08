@@ -1,4 +1,11 @@
-import { Dialog, DialogTitle } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  Stack,
+  TextField,
+} from "@mui/material";
 
 function CreateItemDialog(props) {
   const { onClose, open } = props;
@@ -13,6 +20,15 @@ function CreateItemDialog(props) {
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle> Create Item </DialogTitle>
+      <DialogContent>
+        <Stack component="form" spacing={3}>
+          <FormControl>
+            <TextField 
+            label="apple"
+            ></TextField>
+          </FormControl>
+        </Stack>
+      </DialogContent>
     </Dialog>
   );
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ToDoAPI.Models
 {
@@ -10,6 +11,10 @@ namespace ToDoAPI.Models
         public DateTime? CreatedDateTime { get; set; }
         public int? ModifiedUserId { get; set; }
         public DateTime? ModifiedDateTime { get; set; }
+
+        public virtual ICollection<ToDoList>? ToDoLists { get; set; }
+
+        public virtual ICollection<ListUser> ListUsers { get; set; }
     }
 
     public class CreateUser
@@ -21,5 +26,13 @@ namespace ToDoAPI.Models
         public string PhoneNumber { get; set; }
         public string? CreatedUserId { get; set; }
 
+    }
+
+    public class UserResponse{
+        public string Id { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
+
+        public string? token { get; set; }
     }
 }
