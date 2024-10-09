@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAPI.Models.ApplicationDbContext;
 
@@ -10,9 +11,10 @@ using ToDoAPI.Models.ApplicationDbContext;
 namespace ToDoAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241009043129_UpdateIdToAuto")]
+    partial class UpdateIdToAuto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.33");
@@ -30,53 +32,6 @@ namespace ToDoAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ListUser");
-                });
-
-            modelBuilder.Entity("ToDoAPI.Models.Stage", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedDateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ListId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ModifiedBy")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ModifiedDateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("isFirst")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("isLast")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListId");
-
-                    b.ToTable("Stages");
                 });
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoItem", b =>
@@ -236,17 +191,6 @@ namespace ToDoAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ToDoAPI.Models.Stage", b =>
-                {
-                    b.HasOne("ToDoAPI.Models.ToDoList", "List")
-                        .WithMany("Stages")
-                        .HasForeignKey("ListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("List");
-                });
-
             modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>
                 {
                     b.HasOne("ToDoAPI.Models.Users", "CreatedBy")
@@ -261,8 +205,6 @@ namespace ToDoAPI.Migrations
             modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>
                 {
                     b.Navigation("ListUsers");
-
-                    b.Navigation("Stages");
                 });
 
             modelBuilder.Entity("ToDoAPI.Models.Users", b =>

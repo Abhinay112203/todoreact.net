@@ -6,6 +6,7 @@ using ToDoAPI.Models;
 using ToDoAPI.Models.ApplicationDbContext;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using ToDoAPI.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -25,7 +26,7 @@ builder.Services.AddIdentity<Users, UserRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-
+builder.Services.AddScoped<StagesController>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

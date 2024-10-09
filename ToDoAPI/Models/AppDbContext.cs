@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ToDoAPI.Models.ApplicationDbContext
 {
@@ -10,10 +11,22 @@ namespace ToDoAPI.Models.ApplicationDbContext
         public DbSet<ToDoList> Lists { get; set; }
 
         public DbSet<ListUser> ListUser { get; set; }
+        public DbSet<Stage> Stages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<ToDoList>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Stage>()
+            .HasOne(e => e.List)
+            .WithMany(e => e.Stages)
+            .HasForeignKey(e => e.ListId);
+            modelBuilder.Entity<Stage>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
             modelBuilder.Entity<ToDoList>()
                 .HasOne(m => m.CreatedBy)
                 .WithMany(u => u.ToDoLists)
@@ -30,6 +43,7 @@ namespace ToDoAPI.Models.ApplicationDbContext
                 .HasOne(e => e.ToDoList)
                 .WithMany(e => e.ListUsers)
                 .HasForeignKey(e => e.ToDoListId);
+
         }
     }
 }
