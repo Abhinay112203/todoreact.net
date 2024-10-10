@@ -10,7 +10,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the GitHub repository on the Linux server
-                checkout scm
+                git 'https://github.com/Abhinay112203/todoreact.net.git'
             }
         }
         stage('Build Docker Image') {
