@@ -93,6 +93,14 @@ if (app.Environment.IsDevelopment())
     );
 
 }
+if (app.Environment.IsProduction())
+{
+    app.UseCors(options =>
+    options.WithOrigins("http://68.233.119.75:80", "https://abhinayresume.online")
+    .AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+    );
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
