@@ -6,6 +6,10 @@ node {
 
     stage('Cloning db from git to local') {
         // Pull the latest code from the repository configured in Jenkins
+        sh 'sudo ls'
+    }
+    stage('Cloning db from git to local') {
+        // Pull the latest code from the repository configured in Jenkins
         sh 'sudo cp ./db/* /data/sqlite/todo/* -f'
     }
 
