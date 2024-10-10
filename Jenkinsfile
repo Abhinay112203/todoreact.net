@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Define any environment variables if needed
-        DOCKER_IMAGE_NAME = ".
+        DOCKER_IMAGE_NAME = "."
     }
 
     stages {
