@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         // Define any environment variables if needed
-        DOCKER_IMAGE_NAME = "."
+        DOCKER_IMAGE_NAME = "ToDoAPI"
     }
 
     stages {
         stage('Clone Repository') {
             steps {
                 // Clone the GitHub repository on the Linux server
-                git 'https://github.com/your-username/your-repo.git'
+                checkout scm
             }
         }
         stage('Build Docker Image') {
