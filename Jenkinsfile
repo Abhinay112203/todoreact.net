@@ -7,7 +7,7 @@ node {
     stage('Build Docker Image') {
         // Build the Docker image using the Dockerfile in the 'docker' subfolder
         sh '''
-            docker build -t my-dotnet-app:${BUILD_ID} -f docker/Dockerfile .
+            docker build -t my-dotnet-app:${BUILD_ID} -f ToDoAPI/Dockerfile .
         '''
         // Explanation:
         // - `-t my-dotnet-app:${BUILD_ID}`: Tag the image as 'my-dotnet-app' with the current Jenkins build ID.
