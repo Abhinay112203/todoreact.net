@@ -7,7 +7,7 @@ node {
     stage('Build Docker Image') {
         // Build a Docker image for the .NET application
         sh '''
-            docker build -t my-dotnet-app:${BUILD_ID} .
+            docker build -t ToDoAPI:${BUILD_ID} .
         '''
     }
 
@@ -23,7 +23,7 @@ node {
     stage('Deploy Docker Container') {
         // Run a new Docker container with the built image and expose it on port 5236
         sh '''
-            docker run -d --name dotnet-app -p 5236:5236 my-dotnet-app:${BUILD_ID}
+            docker run -d --name dotnet-app -p 5236:5236 ToDoAPI:${BUILD_ID}
         '''
     }
 
