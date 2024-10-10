@@ -5,9 +5,11 @@ node {
     }
 
     stage('Build Docker Image') {
+        def imageTag = env.BUILD_ID ?: 'latest'
+
         // Build the Docker image using the Dockerfile in the 'docker' subfolder
         sh '''
-            docker build -t my-dotnet-app:${BUILD_ID} -f ToDoAPI/Dockerfile .
+            docker build -t my-dotnet-app:${imageTag} -f ToDoAPI/Dockerfile .
         '''
         // Explanation:
         // - `-t my-dotnet-app:${BUILD_ID}`: Tag the image as 'my-dotnet-app' with the current Jenkins build ID.
@@ -27,7 +29,7 @@ node {
     stage('Deploy Docker Container') {
         // Run a new Docker container with the built image and expose it on port 5236
         sh '''
-            docker run -d --name dotnet-app -p 5236:5236 my-dotnet-app:${BUILD_ID}
+            docker run -d --name dotnet-app -p 5236:80 my-dotnet-app:${BUILD_ID}
         '''
     }
 
