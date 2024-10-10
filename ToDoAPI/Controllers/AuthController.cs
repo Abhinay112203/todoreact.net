@@ -11,7 +11,7 @@ using ToDoAPI.Models.ApplicationDbContext;
 
 namespace ToDoAPI.Controllers
 {
-    [Route("")]
+    [Route("api")]
     [ApiController]
     public class AuthController : ControllerBase
     {

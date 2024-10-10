@@ -15,7 +15,7 @@ using System.Net.Http.Json;
 namespace ToDoAPI.Controllers
 {
     [Authorize]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ListsController : ControllerBase
     {

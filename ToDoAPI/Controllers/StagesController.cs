@@ -9,7 +9,7 @@ using ToDoAPI.Models.ApplicationDbContext;
 namespace ToDoAPI.Controllers
 {
     [Authorize]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class StagesController : ControllerBase
     {

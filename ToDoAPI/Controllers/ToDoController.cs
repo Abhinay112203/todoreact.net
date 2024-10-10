@@ -7,7 +7,7 @@ using ToDoAPI.Models.ApplicationDbContext;
 
 namespace ToDoAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ToDoController : ControllerBase
     {
