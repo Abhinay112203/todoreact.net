@@ -1,65 +1,36 @@
 node {
-    stage('Build .NET Application') {
-        stage('Clone Repository') {
-            // Pull the latest code from the GitHub repository
-            checkout scm
-        }
-        stage('Stopping Existing Docker Container') {
-            sh '''
-                # Stop and remove the existing container if it exists
-                if [ "$(docker ps -q -f name=dotnet-app)" ]; then
-                    docker rm -f dotnet-app
-                fi
-            '''
-        }
-        stage('Install .NET SDK and Required Packages') {
-            // Install .NET SDK if not already installed
-            sh '''
-                # Check if .NET SDK is installed
-                if ! dotnet --version &> /dev/null; then
-                    echo ".NET SDK not found. Installing .NET SDK..."
-                    sudo apt update
-                    sudo apt install -y apt-transport-https \
-                                       dotnet-sdk-7.0
-                else
-                    echo ".NET SDK is already installed"
-                fi
-            '''
-        }
-        stage('Build the Application') {
-            // Navigate to project directory and build the application
-            sh '''
-                # Clean and build the application
-                dotnet clean
-                dotnet build -c Release
-            '''
-        }
-        stage('Publish Application') {
-            // Publish the application to a folder
-            sh '''
-                dotnet publish -c Release -o ./out
-            '''
-        }
-        stage('Clear Previous Deploy Files') {
-            // Clear any previous files from deployment directory
-            sh '''
-                sudo rm -rf /usr/share/nginx/html/dotnet-app/*
-            '''
-        }
-        stage('Move Published Files') {
-            // Copy the newly published files to the deployment directory
-            sh '''
-                sudo cp -rf ./out/* /usr/share/nginx/html/dotnet-app/
-            '''
-        }
-        stage('Restarting Application') {
-            // Start a new Docker container to run the .NET application
-            sh '''
-                docker run -d --name dotnet-app -p 5236:5236 \
-                           -v /usr/share/nginx/html/dotnet-app:/app \
-                           mcr.microsoft.com/dotnet/aspnet:7.0 \
-                           dotnet /app/YourApp.dll
-            '''
-        }
+    stage('Clone Repository') {
+        // Clone the latest code from the repository configured in Jenkins
+        checkout scm
+    }
+
+    stage('Build Docker Image') {
+        // Build a Docker image for the .NET application
+        sh '''
+            docker build -t my-dotnet-app:${BUILD_ID} .
+        '''
+    }
+
+    stage('Stop Existing Docker Container') {
+        // Stop and remove any existing Docker container named 'dotnet-app'
+        sh '''
+            if [ "$(docker ps -q -f name=dotnet-app)" ]; then
+                docker rm -f dotnet-app
+            fi
+        '''
+    }
+
+    stage('Deploy Docker Container') {
+        // Run a new Docker container with the built image and expose it on port 5236
+        sh '''
+            docker run -d --name dotnet-app -p 5236:5236 my-dotnet-app:${BUILD_ID}
+        '''
+    }
+
+    stage('Clean Up Old Docker Images') {
+        // Remove old Docker images to save space
+        sh '''
+            docker image prune -f
+        '''
     }
 }
