@@ -1,14 +1,18 @@
 node {
     stage('Clone Repository') {
-        // Clone the latest code from the repository configured in Jenkins
+        // Pull the latest code from the repository configured in Jenkins
         checkout scm
     }
 
     stage('Build Docker Image') {
-        // Build a Docker image for the .NET application
+        // Build the Docker image using the Dockerfile in the 'docker' subfolder
         sh '''
-            docker build -t ToDoAPI:${BUILD_ID} .
+            docker build -t my-dotnet-app:${BUILD_ID} -f docker/Dockerfile .
         '''
+        // Explanation:
+        // - `-t my-dotnet-app:${BUILD_ID}`: Tag the image as 'my-dotnet-app' with the current Jenkins build ID.
+        // - `-f docker/Dockerfile`: Specify the path to the Dockerfile in the 'docker' subfolder.
+        // - `.`: Build context set to the root of the repository.
     }
 
     stage('Stop Existing Docker Container') {
@@ -23,7 +27,7 @@ node {
     stage('Deploy Docker Container') {
         // Run a new Docker container with the built image and expose it on port 5236
         sh '''
-            docker run -d --name dotnet-app -p 5236:5236 ToDoAPI:${BUILD_ID}
+            docker run -d --name dotnet-app -p 5236:5236 my-dotnet-app:${BUILD_ID}
         '''
     }
 
