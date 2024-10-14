@@ -97,38 +97,44 @@ namespace ToDoAPI.Controllers
 
         // PUT api/<ToDo>/5
         [HttpPut("updateStage")]
-        public async Task<IActionResult> Put([FromBody] UpdateStagePayload newStageDetails )
+        public async Task<IActionResult> Put([FromBody] IEnumerable<UpdateStagePayload> newStageDetails)
         {
-            if (newStageDetails.toDoItemId is null)
+            foreach (var item in newStageDetails)
             {
-                return BadRequest();
-            }
-            if (newStageDetails.stageId is null)
-            {
-                return BadRequest();
-            }
-            ToDoItem toDoItem = await _context.ToDoItems.FindAsync(newStageDetails.toDoItemId);
-            if(toDoItem is null){
-                return BadRequest("No Item Exists with such ID");
-            }
-            toDoItem.StageId = newStageDetails.stageId;
-            toDoItem.UpdatedDateTime = DateTime.Now;
-            toDoItem.UpdatedBy = User?.FindFirst(ClaimTypes.Sid)?.Value;
-            _context.Entry(toDoItem).State = EntityState.Modified;
-            try
-            {
-                await _context.SaveChangesAsync();
 
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoItemExists(newStageDetails.toDoItemId))
+                if (item.toDoItemId is null)
                 {
-                    return NotFound();
+                    return BadRequest();
                 }
-                else
+                if (item.stageId is null)
                 {
-                    throw;
+                    return BadRequest();
+                }
+                ToDoItem toDoItem = await _context.ToDoItems.FindAsync(item.toDoItemId);
+                if (toDoItem is null)
+                {
+                    return BadRequest("No Item Exists with such ID");
+                }
+                toDoItem.StageId = item.stageId;
+                toDoItem.Order = item.Order;
+                toDoItem.UpdatedDateTime = DateTime.Now;
+                toDoItem.UpdatedBy = User?.FindFirst(ClaimTypes.Sid)?.Value;
+                _context.Entry(toDoItem).State = EntityState.Modified;
+                try
+                {
+                    await _context.SaveChangesAsync();
+
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TodoItemExists(item.toDoItemId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
 

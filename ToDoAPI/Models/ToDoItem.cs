@@ -11,6 +11,7 @@
         public string UpdatedBy { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public DateTime UpdatedDateTime { get; set; }
+        public int Order { get; set; }
 
         public string ListId { get; set; }
         public virtual ToDoList ToDoList { get; set; }
@@ -30,5 +31,6 @@
     {
         public string toDoItemId { get; set; }
         public string stageId { get; set; }
+        public int Order { get; set; }
     }
 }
