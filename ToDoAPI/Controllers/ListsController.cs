@@ -57,11 +57,19 @@ namespace ToDoAPI.Controllers
         }
         // GET api/<ListsController>/5
         [HttpGet("{id}/stage")]
-        public async Task<ActionResult<IEnumerable<Stage>>> GetStages(string id)
+        public async Task<ActionResult<IEnumerable<ToDoList>>> GetStages(string id)
         {
             if (!String.IsNullOrEmpty(id))
             {
-                return await _context.Stages.Where(e => e.ListId == id.ToString()).ToListAsync();
+                ToDoList? requiredListWithStages = await _context.Lists.Include(e => e.Stages).Where(e => e.Id == id).FirstOrDefaultAsync();
+                if (requiredListWithStages is not null)
+                {
+                    if (requiredListWithStages.Stages is not null)
+                    {
+                        requiredListWithStages.Stages = requiredListWithStages.Stages.OrderBy(e => e.Order).ToList();
+                    }
+                }
+                return Ok(requiredListWithStages);
             }
             return BadRequest("Provide List Id");
         }
@@ -75,7 +83,14 @@ namespace ToDoAPI.Controllers
             {
                 return BadRequest("List Name is required.");
             }
-            ToDoList? existingList = _context.Lists.Where(x => (x.Name == value.Name && x.CreatedById == userId)).FirstOrDefault();
+            if(value.PrefixId is null)
+            {
+                return BadRequest("Short Prefix is Required");
+            } else
+            {
+                value.PrefixId = value.PrefixId.ToUpper();
+            }
+            ToDoList? existingList = _context.Lists.Where(x => (x.Name == value.Name && x.CreatedById == userId && x.PrefixId == value.PrefixId)).FirstOrDefault();
             if (existingList != null)
             {
                 return BadRequest("List with same name already created by you");
@@ -87,6 +102,7 @@ namespace ToDoAPI.Controllers
                 Description = value.Description,
                 CreatedById = !String.IsNullOrEmpty(userId) ? userId : "",
                 CreatedOn = System.DateTime.Now,
+                PrefixId = value.PrefixId
             };
             _context.Lists.Add(payload);
             var result = await _context.SaveChangesAsync();
@@ -98,20 +114,21 @@ namespace ToDoAPI.Controllers
             // Add Stage to List
             try
             {
-                var url = HttpContext.Request.Scheme + "://"+ HttpContext.Request.Host + "/api/Stages";
+                var url = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host + "/api/Stages";
                 if (value.StartingStage is not null)
                 {
                     StagePayload startPayload = new StagePayload() { Name = value.StartingStage, Order = 1, isFirst = true, isLast = false, ListId = payload.Id };
                     await _stageController.Post(startPayload, User.FindFirst(ClaimTypes.Sid)?.Value);
                     //var result1 = await _httpClient.PostAsJsonAsync<StagePayload>(url, startPayload);
                 }
-                if(value.EndingStage is not null)
+                if (value.EndingStage is not null)
                 {
                     await _stageController.Post(new StagePayload() { Name = value.EndingStage, Order = 2, isFirst = false, isLast = true, ListId = payload.Id }, User.FindFirst(ClaimTypes.Sid)?.Value);
                     //var result2 = await _httpClient.PostAsJsonAsync<StagePayload>(url , new StagePayload() { Name = value.EndingStage, Order = 2, isFirst = false, isLast = true, ListId = payload.Id });
                 }
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 return Ok(ex);
             }
             return Ok(payload);

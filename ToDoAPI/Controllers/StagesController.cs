@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ToDoAPI.Models;
 using ToDoAPI.Models.ApplicationDbContext;
@@ -25,6 +26,12 @@ namespace ToDoAPI.Controllers
         {
             return await _context.Stages.FindAsync(id);
         }
+        // GET api/<StagesController>/5/tasks
+        [HttpGet("{id}/tasks")]
+        public async Task<ActionResult<IEnumerable<ToDoItem>>> GetStageTasks(string id)
+        {
+            return await _context.ToDoItems.Where(e => e.StageId == id).ToListAsync();
+        }
 
         // POST api/<StagesController>
         [HttpPost]
@@ -33,9 +40,31 @@ namespace ToDoAPI.Controllers
             userId = userId is null ? User.FindFirst(ClaimTypes.Sid)?.Value : userId;
             if (value is not null)
             {
+                IEnumerable<Stage> currentStages = await _context.Stages.Where(e => e.ListId == value.ListId).ToListAsync();
+                if(value.Order == 1)
+                {
+                    value.isFirst = true;
+                    value.isLast = false;
+                }
+                if(value.Order == (currentStages.Count() + 1))
+                {
+                    value.isLast = true;
+                    value.isFirst = false;
+                }
+                foreach (var currentStage in currentStages)
+                {
+                    if(currentStage.isFirst && value.isFirst)
+                    {
+                        currentStage.isFirst = false;
+                    }
+                    if(currentStage.isLast && value.isLast) { currentStage.isLast = false; }
+                    if(currentStage.Order >= value.Order) { currentStage.Order = currentStage.Order + 1; }
+
+                }
                 Stage payload = new Stage()
                 {
                     Name = value.Name,
+                    Description = value.Description is not null ? value.Description : "",
                     isFirst = value.isFirst,
                     isLast = value.isLast,
                     ListId = value.ListId,

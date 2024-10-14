@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <None Remove="..\.dockerignore" />
+    <None Remove="todolist.db" />
 	<Content Include="..\Jenkinsfile">
 		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</Content>

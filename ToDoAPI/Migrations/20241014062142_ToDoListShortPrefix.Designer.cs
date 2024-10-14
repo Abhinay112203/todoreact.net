@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAPI.Models.ApplicationDbContext;
 
@@ -10,9 +11,10 @@ using ToDoAPI.Models.ApplicationDbContext;
 namespace ToDoAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241014062142_ToDoListShortPrefix")]
+    partial class ToDoListShortPrefix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.33");
@@ -85,8 +87,9 @@ namespace ToDoAPI.Migrations
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoItem", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("AssginedTo")
                         .HasColumnType("TEXT");
@@ -117,10 +120,6 @@ namespace ToDoAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdatedDateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("shortId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

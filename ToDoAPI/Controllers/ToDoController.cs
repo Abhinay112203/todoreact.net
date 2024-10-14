@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Humanizer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Security.Claims;
 using ToDoAPI.Models;
 using ToDoAPI.Models.ApplicationDbContext;
 
@@ -7,6 +11,7 @@ using ToDoAPI.Models.ApplicationDbContext;
 
 namespace ToDoAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ToDoController : ControllerBase
@@ -38,29 +43,86 @@ namespace ToDoAPI.Controllers
 
         // POST api/<ToDo>
         [HttpPost]
-        public async Task<ActionResult<ToDoItem>> Post([FromBody] ToDoItem todoItem)
+        public async Task<ActionResult<ToDoItem>> Post([FromBody] ToDoItemPayload todoItem)
         {
-            _context.ToDoItems.Add(todoItem);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(ToDoItem), new { id = todoItem.Id }, todoItem);
+            string userId = User.FindFirst(ClaimTypes.Sid)?.Value;
+            try
+            {
+                ToDoItem payload = new ToDoItem()
+                {
+                    CreatedDateTime = DateTime.Now,
+                    CreatedBy = userId,
+                    UpdatedBy = userId,
+                    UpdatedDateTime = DateTime.Now,
+                    AssginedTo = todoItem.AssignedTo
+                };
+                if (todoItem is not null && todoItem.Name is not null)
+                {
+                    payload.Name = todoItem.Name;
+                    payload.Description = todoItem.Description;
+                    Stage? existingStageLists = await _context.Stages.Where(e => e.Id == todoItem.StageId).Include(e => e.List).FirstOrDefaultAsync();
+                    if (existingStageLists is not null && existingStageLists.List is not null)
+                    {
+                        payload.StageId = todoItem.StageId;
+                        payload.ListId = todoItem.ListId;
+                        string ListId = existingStageLists.List.Id;
+                        string shortIdPefix = existingStageLists.List.PrefixId;
+                        var lastCreatedItem = await _context.ToDoItems
+                            .Where(t => t.ListId == ListId)
+                            .OrderByDescending(t => t.CreatedDateTime)
+                            .FirstOrDefaultAsync();
+                        if (lastCreatedItem is not null)
+                        {
+                            int latestTicketShortNum = Int32.Parse(lastCreatedItem.shortId.Substring(shortIdPefix.Length));
+                            var currentTicketNumber = String.Concat(latestTicketShortNum + 1).PadLeft(4, '0');
+                            payload.shortId = shortIdPefix + currentTicketNumber;
+                        }
+                        else
+                        {
+                            payload.shortId = shortIdPefix + "0001";
+                        }
+                        _context.ToDoItems.Add(payload);
+                    }
+                    var result = await _context.SaveChangesAsync();
+                }
+                return Ok("Successfully created " + " - " + payload.shortId);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest("Error Occured");
+            }
         }
 
         // PUT api/<ToDo>/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(long id, [FromBody] ToDoItem toDoItem)
+        [HttpPut("updateStage")]
+        public async Task<IActionResult> Put([FromBody] UpdateStagePayload newStageDetails )
         {
-            if (id != toDoItem.Id)
+            if (newStageDetails.toDoItemId is null)
             {
                 return BadRequest();
             }
+            if (newStageDetails.stageId is null)
+            {
+                return BadRequest();
+            }
+            ToDoItem toDoItem = await _context.ToDoItems.FindAsync(newStageDetails.toDoItemId);
+            if(toDoItem is null){
+                return BadRequest("No Item Exists with such ID");
+            }
+            toDoItem.StageId = newStageDetails.stageId;
+            toDoItem.UpdatedDateTime = DateTime.Now;
+            toDoItem.UpdatedBy = User?.FindFirst(ClaimTypes.Sid)?.Value;
             _context.Entry(toDoItem).State = EntityState.Modified;
             try
             {
                 await _context.SaveChangesAsync();
+
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TodoItemExists(id))
+                if (!TodoItemExists(newStageDetails.toDoItemId))
                 {
                     return NotFound();
                 }
@@ -87,7 +149,7 @@ namespace ToDoAPI.Controllers
             return NoContent();
         }
 
-        private bool TodoItemExists(long id)
+        private bool TodoItemExists(string id)
         {
             return _context.ToDoItems.Any(e => e.Id == id);
         }

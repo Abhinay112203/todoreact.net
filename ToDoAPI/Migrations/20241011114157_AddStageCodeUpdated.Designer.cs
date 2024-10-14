@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ToDoAPI.Models.ApplicationDbContext;
 
@@ -10,9 +11,10 @@ using ToDoAPI.Models.ApplicationDbContext;
 namespace ToDoAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241011114157_AddStageCodeUpdated")]
+    partial class AddStageCodeUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.33");
@@ -85,8 +87,9 @@ namespace ToDoAPI.Migrations
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoItem", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("AssginedTo")
                         .HasColumnType("TEXT");
@@ -99,10 +102,6 @@ namespace ToDoAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ListId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -119,13 +118,7 @@ namespace ToDoAPI.Migrations
                     b.Property<DateTime>("UpdatedDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("shortId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ListId");
 
                     b.HasIndex("StageId");
 
@@ -153,10 +146,6 @@ namespace ToDoAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PrefixId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -269,21 +258,13 @@ namespace ToDoAPI.Migrations
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoItem", b =>
                 {
-                    b.HasOne("ToDoAPI.Models.ToDoList", "ToDoList")
-                        .WithMany()
-                        .HasForeignKey("ListId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ToDoAPI.Models.Stage", "Stage")
-                        .WithMany()
+                        .WithMany("Stages")
                         .HasForeignKey("StageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Stage");
-
-                    b.Navigation("ToDoList");
                 });
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>
@@ -295,6 +276,11 @@ namespace ToDoAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+                });
+
+            modelBuilder.Entity("ToDoAPI.Models.Stage", b =>
+                {
+                    b.Navigation("Stages");
                 });
 
             modelBuilder.Entity("ToDoAPI.Models.ToDoList", b =>

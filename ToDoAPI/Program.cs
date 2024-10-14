@@ -13,7 +13,7 @@ var configuration = builder.Configuration;
 // Add Db to Application
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(configuration.GetConnectionString("DefaultConnection"))
@@ -76,7 +76,7 @@ builder.Services.AddSwaggerGen(option =>
                     Id="Bearer"
                 }
             },
-            new string[]{}
+            new string[]{ JwtBearerDefaults.AuthenticationScheme }
         }
     });
 });
@@ -87,9 +87,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI( options => options.EnableValidator() );
     app.UseCors(options =>
-        options.AllowAnyHeader().AllowAnyOrigin()
+        options.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod()
     );
 
 }
