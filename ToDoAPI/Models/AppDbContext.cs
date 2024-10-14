@@ -17,6 +17,9 @@ namespace ToDoAPI.Models.ApplicationDbContext
         {
             base.OnModelCreating(modelBuilder);
             // Auto Generate
+            modelBuilder.Entity<ToDoItem>()
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
             modelBuilder.Entity<ToDoList>()
                 .Property(e => e.Id)
                 .ValueGeneratedOnAdd();
