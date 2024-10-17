@@ -16,7 +16,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(configuration.GetConnectionString("DefaultConnection"))
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
 );
 
 var key = Encoding.ASCII.GetBytes(configuration["JWT:secret"]);
@@ -81,6 +81,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

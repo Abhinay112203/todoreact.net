@@ -35,4 +35,14 @@ namespace ToDoAPI.Models
 
         public string? token { get; set; }
     }
+
+    public class UsersDropdown
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+    public class UsersDropdownPayload
+    {
+        public string ListId { get; set; }
+    }
 }

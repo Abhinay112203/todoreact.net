@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.Security.Claims;
 using ToDoAPI.Models;
 using ToDoAPI.Models.ApplicationDbContext;
 
@@ -9,6 +11,7 @@ using ToDoAPI.Models.ApplicationDbContext;
 
 namespace ToDoAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -48,11 +51,12 @@ namespace ToDoAPI.Controllers
             }
             else
             {
+                string userId = User.FindFirst(ClaimTypes.Sid)?.Value;
                 var userData = new Users()
                 {
                     UserName = value.Name,
                     Email = value.Email,
-                    CreatedUserId = !String.IsNullOrEmpty(value.CreatedUserId) ? value.CreatedUserId : "admin"
+                    CreatedUserId = !String.IsNullOrEmpty(userId) ? userId : "admin"
                 };
                 try
                 {
@@ -61,7 +65,7 @@ namespace ToDoAPI.Controllers
                     {
                         return BadRequest(result);
                     }
-                    return Ok(result);
+                    return Ok(userData.Id);
                 }
                 catch (DbException ex)
                 {
@@ -105,6 +109,20 @@ namespace ToDoAPI.Controllers
                 }
             }
             return NoContent();
+        }
+
+        [HttpPost("userSuggestions/{listId}")]
+        public async Task<ActionResult<IEnumerable<UsersDropdown>>> UserSuggestions(string listId)
+        {
+            IEnumerable<UsersDropdown> usersList = await (from lu in _context.ListUser
+                                                          join us in _context.Users on lu.UserId equals us.Id
+                                                          where lu.ToDoListId == listId
+                                                          select new UsersDropdown()
+                                                          {
+                                                              Id = us.Id,
+                                                              Name = us.UserName,
+                                                          }).ToListAsync();
+            return Ok(usersList);
         }
     }
 }

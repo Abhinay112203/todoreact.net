@@ -4,11 +4,6 @@ node {
         checkout scm
     }
 
-    stage('Cloning db from git to local') {
-        // Pull the latest code from the repository configured in Jenkins
-        sh 'sudo cp ./ToDoAPI/db/* /data/sqlite/todo/* -f'
-    }
-
     stage('Build Docker Image') {
 
         // Build the Docker image using the Dockerfile in the 'docker' subfolder
@@ -33,7 +28,7 @@ node {
     stage('Deploy Docker Container') {
         // Run a new Docker container with the built image and expose it on port 5236
         sh '''
-            docker run -d --name dotnet-app -v /data/sqlite/todo:/app/db -p 5236:80 my-dotnet-app:${BUILD_ID}
+            docker run -d --name dotnet-app -p 5236:80 my-dotnet-app:${BUILD_ID}
         '''
     }
 
