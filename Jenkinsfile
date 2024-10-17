@@ -28,7 +28,7 @@ node {
     stage('Deploy Docker Container') {
         // Run a new Docker container with the built image and expose it on port 5236
         sh '''
-            docker run -d --name dotnet-app -p 5236:80 my-dotnet-app:${BUILD_ID}
+            docker run -d --name dotnet-app -v /data/configs/react-ui-net/appsettings.json:/app/appsettings.json -p 5236:80 my-dotnet-app:${BUILD_ID}
         '''
     }
 
